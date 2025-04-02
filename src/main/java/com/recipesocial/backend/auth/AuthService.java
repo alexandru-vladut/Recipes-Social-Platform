@@ -1,8 +1,8 @@
 package com.recipesocial.backend.auth;
 
+import com.recipesocial.backend.exception.EmailAlreadyExistsException;
 import com.recipesocial.backend.model.User;
 import com.recipesocial.backend.repository.UserRepository;
-import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +23,11 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     public AuthResponseDTO register(RegisterRequestDTO request) {
+        // ✅ Check if user already exists
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new EmailAlreadyExistsException("Email is already registered");
+        }
+
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());

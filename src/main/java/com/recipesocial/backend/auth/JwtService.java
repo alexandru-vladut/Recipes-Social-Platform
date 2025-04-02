@@ -51,6 +51,10 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
+    public String extractUserRole(String token) {
+        return extractAllClaims(token).get("role", String.class);
+    }
+
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())

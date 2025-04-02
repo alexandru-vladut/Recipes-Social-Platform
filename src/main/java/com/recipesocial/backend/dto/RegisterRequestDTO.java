@@ -1,11 +1,12 @@
-package com.recipesocial.backend.auth;
+package com.recipesocial.backend.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class AuthenticationRequestDTO {
+public class RegisterRequestDTO {
+    private String name;
     private String email;
     private String password;
 }

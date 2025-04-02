@@ -1,5 +1,8 @@
 package com.recipesocial.backend.auth;
 
+import com.recipesocial.backend.dto.AuthResponseDTO;
+import com.recipesocial.backend.dto.AuthenticationRequestDTO;
+import com.recipesocial.backend.dto.RegisterRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

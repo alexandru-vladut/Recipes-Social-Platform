@@ -1,5 +1,8 @@
 package com.recipesocial.backend.auth;
 
+import com.recipesocial.backend.dto.AuthResponseDTO;
+import com.recipesocial.backend.dto.AuthenticationRequestDTO;
+import com.recipesocial.backend.dto.RegisterRequestDTO;
 import com.recipesocial.backend.exception.EmailAlreadyExistsException;
 import com.recipesocial.backend.model.User;
 import com.recipesocial.backend.repository.UserRepository;

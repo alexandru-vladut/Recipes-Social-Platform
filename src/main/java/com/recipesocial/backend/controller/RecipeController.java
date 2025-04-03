@@ -7,6 +7,7 @@ import com.recipesocial.backend.model.Role;
 import com.recipesocial.backend.model.User;
 import com.recipesocial.backend.repository.RecipeRepository;
 import com.recipesocial.backend.auth.security.AuthUtils;
+import com.recipesocial.backend.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import java.util.List;
 public class RecipeController {
 
     private final RecipeRepository recipeRepository;
+    private final UserRepository userRepository;
 
     @PostMapping(consumes = "application/json")
     public ResponseEntity<Recipe> createRecipe(@Valid @RequestBody CreateRecipeDTO createRecipeDTO) {
@@ -47,6 +49,18 @@ public class RecipeController {
         return recipeRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Recipe>> getRecipesByUser(@PathVariable Long userId) {
+        // Check if the user exists
+        if (!userRepository.existsById(userId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        List<Recipe> recipes = recipeRepository.findByUserId(userId);
+
+        return ResponseEntity.ok(recipes);
     }
 
     @PutMapping("/{id}")

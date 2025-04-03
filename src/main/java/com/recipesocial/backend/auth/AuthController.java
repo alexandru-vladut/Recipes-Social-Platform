@@ -2,8 +2,9 @@ package com.recipesocial.backend.auth;
 
 import com.recipesocial.backend.auth.dto.AuthResponseDTO;
 import com.recipesocial.backend.auth.dto.AuthenticationRequestDTO;
-import com.recipesocial.backend.auth.dto.RegisterRequestDTO;
+import com.recipesocial.backend.dto.CreateUserDTO;
 import com.recipesocial.backend.auth.service.AuthService;
+import com.recipesocial.backend.model.Role;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping(value = "/register", consumes = "application/json")
-    public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
-        return ResponseEntity.ok(authService.register(request));
+    public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody CreateUserDTO request, @RequestParam("role") Role role) {
+        return ResponseEntity.ok(authService.register(request, role));
     }
 
     @PostMapping(value = "/login", consumes = "application/json")

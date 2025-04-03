@@ -1,13 +1,12 @@
-package com.recipesocial.backend.auth.dto;
+package com.recipesocial.backend.dto;
 
-import com.recipesocial.backend.model.Role;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class RegisterRequestDTO {
+public class CreateUserDTO {
 
     @NotBlank(message = "Name cannot be blank")
     @Size(max = 100, message = "Name can't be longer than 100 characters")
@@ -19,6 +18,4 @@ public class RegisterRequestDTO {
 
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
-
-    private Role role = Role.USER;
 }

@@ -2,10 +2,11 @@ package com.recipesocial.backend.auth.service;
 
 import com.recipesocial.backend.auth.dto.AuthResponseDTO;
 import com.recipesocial.backend.auth.dto.AuthenticationRequestDTO;
-import com.recipesocial.backend.auth.dto.RegisterRequestDTO;
+import com.recipesocial.backend.dto.CreateUserDTO;
 import com.recipesocial.backend.exception.EmailAlreadyExistsException;
 import com.recipesocial.backend.exception.InvalidCredentialsException;
 import com.recipesocial.backend.exception.UserNotFoundException;
+import com.recipesocial.backend.model.Role;
 import com.recipesocial.backend.model.User;
 import com.recipesocial.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthResponseDTO register(RegisterRequestDTO request) {
+    public AuthResponseDTO register(CreateUserDTO request, Role role) {
         // ✅ Check if user already exists
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("Email is already registered");
@@ -37,7 +38,7 @@ public class AuthService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole());
+        user.setRole(role);
         userRepository.save(user);
 
         Map<String, Object> claims = new HashMap<>();

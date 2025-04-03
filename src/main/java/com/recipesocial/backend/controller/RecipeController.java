@@ -4,14 +4,14 @@ import com.recipesocial.backend.model.Recipe;
 import com.recipesocial.backend.model.User;
 import com.recipesocial.backend.repository.RecipeRepository;
 import com.recipesocial.backend.repository.UserRepository;
+import com.recipesocial.backend.auth.security.AuthUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/recipes")
+@RequestMapping(value = "/recipes", produces = "application/json")
 @RequiredArgsConstructor
 public class RecipeController {
 
@@ -19,10 +19,13 @@ public class RecipeController {
     private final UserRepository userRepository;
 
     // Create a recipe
-    @PostMapping
-    public Recipe createRecipe(@RequestBody Recipe recipe, Authentication authentication) {
-        User currentUser = (User) authentication.getPrincipal();  // This works because User implements UserDetails
+    @PostMapping(consumes = "application/json")
+    public Recipe createRecipe(@RequestBody Recipe recipe) {
+        // Get current user
+        User currentUser = AuthUtils.getCurrentUser();
+
         recipe.setAuthor(currentUser);
+
         return recipeRepository.save(recipe);
     }
 

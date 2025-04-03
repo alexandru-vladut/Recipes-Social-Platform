@@ -1,4 +1,4 @@
-package com.recipesocial.backend.dto;
+package com.recipesocial.backend.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,5 +1,6 @@
-package com.recipesocial.backend.auth;
+package com.recipesocial.backend.auth.security;
 
+import com.recipesocial.backend.auth.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

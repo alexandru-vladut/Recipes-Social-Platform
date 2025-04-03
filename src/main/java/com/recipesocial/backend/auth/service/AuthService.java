@@ -1,9 +1,11 @@
-package com.recipesocial.backend.auth;
+package com.recipesocial.backend.auth.service;
 
-import com.recipesocial.backend.dto.AuthResponseDTO;
-import com.recipesocial.backend.dto.AuthenticationRequestDTO;
-import com.recipesocial.backend.dto.RegisterRequestDTO;
+import com.recipesocial.backend.auth.dto.AuthResponseDTO;
+import com.recipesocial.backend.auth.dto.AuthenticationRequestDTO;
+import com.recipesocial.backend.auth.dto.RegisterRequestDTO;
 import com.recipesocial.backend.exception.EmailAlreadyExistsException;
+import com.recipesocial.backend.exception.InvalidCredentialsException;
+import com.recipesocial.backend.exception.UserNotFoundException;
 import com.recipesocial.backend.model.User;
 import com.recipesocial.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,11 +37,11 @@ public class AuthService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole("USER"); // default role
+        user.setRole(request.getRole());
         userRepository.save(user);
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", user.getRole());
+        claims.put("role", user.getRole().name());
 
         String token = jwtService.generateToken(claims, user.getEmail());
         return new AuthResponseDTO(token);
@@ -51,14 +53,14 @@ public class AuthService {
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
         } catch (AuthenticationException e) {
-            throw new RuntimeException("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid credentials");
         }
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", user.getRole());
+        claims.put("role", user.getRole().name());
 
         String token = jwtService.generateToken(claims, user.getEmail());
         return new AuthResponseDTO(token);

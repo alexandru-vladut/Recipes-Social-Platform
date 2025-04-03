@@ -3,17 +3,18 @@ package com.recipesocial.backend.controller;
 import com.recipesocial.backend.dto.UpdateUserDTO;
 import com.recipesocial.backend.model.User;
 import com.recipesocial.backend.repository.UserRepository;
+import com.recipesocial.backend.auth.security.AuthUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping(value = "/users", produces = "application/json")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -34,9 +35,9 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = "application/json")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UpdateUserDTO updateData) {
+    public ResponseEntity<String> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserDTO updateData) {
         return userRepository.findById(id).map(user -> {
             if (updateData.getName() != null) user.setName(updateData.getName());
             if (updateData.getEmail() != null) user.setEmail(updateData.getEmail());
@@ -52,14 +53,15 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id, Authentication auth) {
-        User loggedInUser = (User) auth.getPrincipal(); // this works because your User implements UserDetails
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        // Get current user
+        User currentUser = AuthUtils.getCurrentUser();
 
         if (!userRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
 
-        if (loggedInUser.getId().equals(id)) {
+        if (currentUser.getId().equals(id)) {
             return ResponseEntity.badRequest().body("You cannot delete your own account.");
         }
 

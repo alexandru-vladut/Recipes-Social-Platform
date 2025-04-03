@@ -1,4 +1,4 @@
-package com.recipesocial.backend.auth.security;
+package com.recipesocial.backend.auth.security.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

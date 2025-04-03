@@ -1,7 +1,7 @@
-package com.recipesocial.backend.config;
+package com.recipesocial.backend.auth.security.config;
 
-import com.recipesocial.backend.auth.security.CustomAccessDeniedHandler;
-import com.recipesocial.backend.auth.security.CustomAuthenticationEntryPoint;
+import com.recipesocial.backend.auth.security.handler.CustomAccessDeniedHandler;
+import com.recipesocial.backend.auth.security.handler.CustomAuthenticationEntryPoint;
 import com.recipesocial.backend.auth.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

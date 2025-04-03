@@ -1,4 +1,4 @@
-package com.recipesocial.backend.config;
+package com.recipesocial.backend.auth.security.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

@@ -1,11 +1,14 @@
 package com.recipesocial.backend.controller;
 
-import com.recipesocial.backend.dto.UpdateUserDTO;
+import com.recipesocial.backend.dto.EditUserDTO;
+import com.recipesocial.backend.model.Recipe;
+import com.recipesocial.backend.model.Role;
 import com.recipesocial.backend.model.User;
 import com.recipesocial.backend.repository.UserRepository;
 import com.recipesocial.backend.auth.security.AuthUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,43 +32,54 @@ public class UserController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return userRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping(value = "/{id}", consumes = "application/json")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserDTO updateData) {
-        return userRepository.findById(id).map(user -> {
-            if (updateData.getName() != null) user.setName(updateData.getName());
-            if (updateData.getEmail() != null) user.setEmail(updateData.getEmail());
-            if (updateData.getPassword() != null && !updateData.getPassword().isBlank()) {
-                user.setPassword(passwordEncoder.encode(updateData.getPassword()));
-            }
-            if (updateData.getRole() != null) user.setRole(updateData.getRole());
+    public ResponseEntity<String> editUser(@PathVariable Long id, @Valid @RequestBody EditUserDTO updateData) {
+        // Check if the user exists
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + id + " not found.");
+        }
 
-            userRepository.save(user);
-            return ResponseEntity.ok("User updated successfully.");
-        }).orElse(ResponseEntity.notFound().build());
+        // Check if the current user is an admin or the user themselves
+        User currentUser = AuthUtils.getCurrentUser();
+        if (!currentUser.getRole().equals(Role.ADMIN) && !currentUser.getId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can only edit your own details or if you are an admin.");
+        }
+
+        // Update the user with non-null fields from the DTO
+        if (updateData.getName() != null) user.setName(updateData.getName());
+        if (updateData.getEmail() != null) user.setEmail(updateData.getEmail());
+        if (updateData.getPassword() != null) user.setPassword(passwordEncoder.encode(updateData.getPassword()));
+
+        // Save the updated user
+        userRepository.save(user);
+
+        return ResponseEntity.ok("User updated successfully.");
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        // Get current user
-        User currentUser = AuthUtils.getCurrentUser();
-
+        // Check if the user exists
         if (!userRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + id + " not found.");
         }
 
+        // Check if the current user is the user themselves
+        User currentUser = AuthUtils.getCurrentUser();
         if (currentUser.getId().equals(id)) {
             return ResponseEntity.badRequest().body("You cannot delete your own account.");
         }
 
+        // Delete the user
         userRepository.deleteById(id);
+
         return ResponseEntity.ok("User deleted successfully.");
     }
 }
